@@ -11,7 +11,16 @@ class Program
     {
         List<uint> Values = new List<uint>();
         uint[] Data = new uint[80];
+
+        if (!File.Exists("Config.txt"))
+        {
+            Console.WriteLine("setting.txtが見つかりませんでした");
+            Console.ReadKey();
+            return;
+        }
         string[] lines = File.ReadAllLines("Config.txt");
+
+        Console.WriteLine($"[年, 月, 日, 時, 分, 秒, VCount, Timer0, 初期SEED]");
 
         foreach (string line in lines)
         {
@@ -36,33 +45,29 @@ class Program
         //Values[11] = Prm2
         //Values[12] = Prm3
 
-        var Dt = new DateTime(2000, 01, 01, 0, 0, 0);
+        var Dt = new DateTime(2011, 12, 13, 14, 15, 55);
 
-        for(int n = 0; n < 1; n++)
+        for(int n = 0; n < 10; n++)
         {
 
             byte[] YMDD = new byte[4];
 
-            YMDD[3] = (byte)(Dt.Year % 100);
-            YMDD[2] = (byte)Dt.Month;
-            YMDD[1] = (byte)Dt.Day;
-            YMDD[0] = (byte)Dt.DayOfWeek;
+            YMDD[3] = toHex(Dt.Year % 100);
+            YMDD[2] = toHex(Dt.Month);
+            YMDD[1] = toHex(Dt.Day);
+            YMDD[0] = (byte)(Dt.DayOfWeek);
 
             uint Date = BitConverter.ToUInt32(YMDD, 0);
 
-            Console.WriteLine($"Year: {Dt.Year}, Month: {Dt.Month}, Day: {Dt.Day}, Dow: {Dt.DayOfWeek}");
-
             byte[] HMSZ = new byte[4];
 
-            HMSZ[3] = (byte)Dt.Hour;
-            HMSZ[2] = (byte)Dt.Minute;
-            HMSZ[1] = (byte)Dt.Second;
+            HMSZ[3] = toHex(Dt.Hour);
+            if (Dt.Hour > 11) HMSZ[3] += 0x40;
+            HMSZ[2] = toHex(Dt.Minute);
+            HMSZ[1] = toHex(Dt.Second);
             HMSZ[0] = 0;
 
             uint Time = BitConverter.ToUInt32(HMSZ, 0);
-
-            Console.WriteLine($"Hour: {Dt.Hour}, Minute: {Dt.Minute}, Second: {Dt.Second}");
-
 
             Data[0] = toLittleEndian(Values[0]);
             Data[1] = toLittleEndian(Values[1]);
@@ -80,12 +85,6 @@ class Program
             Data[13] = (Values[10]);
             Data[14] = (Values[11]);
             Data[15] = (Values[12]);
-
-            for (int i = 0; i <= 15; i++)
-            {
-                Console.WriteLine($"Data[{i}] = 0x{Data[i]:X8}");
-
-            }
 
             //------------------------------------------------------
             for (int t = 16; t < 80; t++)
@@ -145,10 +144,23 @@ class Program
             seed |= toLittleEndian(H0 + A);
             //------------------------------------------------------
 
-            Console.WriteLine($"Seed: 0x{seed:X16}");
+            YMDD[3] = (byte)(Dt.Year % 100);
+            YMDD[2] = (byte)Dt.Month;
+            YMDD[1] = (byte)Dt.Day;
 
-            Dt = Dt.AddSeconds(10);
+            HMSZ[3] = (byte)Dt.Hour;
+            HMSZ[2] = (byte)Dt.Minute;
+            HMSZ[1] = (byte)Dt.Second;
+
+            Console.WriteLine($"{YMDD[3]}, {YMDD[2]}, {YMDD[1]}, {HMSZ[3]}, {HMSZ[2]}, {HMSZ[1]}, 0x{Values[3]:X2}, 0x{Values[4]:X4}, 0x{seed:X16}");
+
+            Dt = Dt.AddSeconds(1);
         }
+    }
+
+    static byte toHex(int value)
+    {
+        return (byte)((value / 10) * 6 + value);
     }
 
     static uint toLittleEndian(uint values)
