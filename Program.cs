@@ -22,14 +22,28 @@ class Program
 
         Console.WriteLine($"[年, 月, 日, 時, 分, 秒, VCount, Timer0, 初期SEED]");
 
-        foreach (string line in lines)
+        for (int i = 0; i < 13; i++)
         {
-            int index = line.IndexOf("0x");
+            int index = lines[i].IndexOf("0x");
 
-            string hex = line.Substring(index + 2);
+            string hex = lines[i].Substring(index + 2);
             uint val = uint.Parse(hex, NumberStyles.HexNumber);
             Values.Add(val);
         }
+
+        var Dt = new DateTime(2000, 1, 1, 0, 0, 0);
+        int AddHours = 0;
+        int AddMinutes = 0;
+        int AddSeconds = 1;
+        int Count = 1;
+
+        Dt = DateTime.Parse(lines[14].Split('=')[1].Trim());
+        AddHours = int.Parse(lines[15].Split('=')[1].Trim());
+        AddMinutes = int.Parse(lines[16].Split('=')[1].Trim());
+        AddSeconds = int.Parse(lines[17].Split('=')[1].Trim());
+        Count = int.Parse(lines[18].Split('=')[1].Trim());
+
+        var increment = new TimeSpan(AddHours, AddMinutes, AddSeconds);
 
         //Values[0] = Nazo1
         //Values[1] = Nazo2
@@ -45,9 +59,7 @@ class Program
         //Values[11] = Prm2
         //Values[12] = Prm3
 
-        var Dt = new DateTime(2011, 12, 13, 14, 15, 55);
-
-        for(int n = 0; n < 10; n++)
+        for (int n = 0; n < Count; n++)
         {
 
             byte[] YMDD = new byte[4];
@@ -154,7 +166,7 @@ class Program
 
             Console.WriteLine($"{YMDD[3]}, {YMDD[2]}, {YMDD[1]}, {HMSZ[3]}, {HMSZ[2]}, {HMSZ[1]}, 0x{Values[3]:X2}, 0x{Values[4]:X4}, 0x{seed:X16}");
 
-            Dt = Dt.AddSeconds(1);
+            Dt = Dt.Add(increment);
         }
     }
 
