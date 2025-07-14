@@ -10,6 +10,13 @@ internal class Program
 {
     static void Main(string[] args)
     {
+        if (!File.Exists("Config.txt"))
+        {
+            Console.WriteLine("setting.txtが見つかりませんでした");
+            Console.ReadKey();
+            return;
+        }
+
         PID.GenSeed();
     }
 }
