@@ -197,6 +197,7 @@ public static class PID
 
             BaseDt = BaseDt.Add(PID.increment);
         }
+        Console.ReadKey();
     }
 
     static byte toHex(int value)
