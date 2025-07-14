@@ -16,5 +16,5 @@ DateTime = 2011/12/13 14:15:16
 AddHours = 0
 AddMinutes = 10
 AssSeconds = 0
-Coutn = 10
+Count = 10
 ------------------------------
